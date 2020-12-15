@@ -20,7 +20,7 @@ class PreTestSQLite extends State<MyApp> {
   TextEditingController controllerName,
       controllerPrice,
       controllerQuantity = TextEditingController();
-  int id, price, quantity;
+  int id, price, quantity, grandTotalPrice;
   String name;
 
   final formKey = new GlobalKey<FormState>();
@@ -38,6 +38,22 @@ class PreTestSQLite extends State<MyApp> {
   refreshList() {
     setState(() {
       groceries = dbHelper.getGroceries();
+    });
+    regenerateTotal();
+  }
+
+  regenerateTotal() {
+    int total;
+    List<Grocery> listGroceries;
+    if (listGroceries.length > 0) {
+      for (int i = 0; i < listGroceries.length; i++) {
+        total = total + (listGroceries[i].price * listGroceries[i].quantity);
+      }
+    } else {
+      total = 0;
+    }
+    setState(() {
+      grandTotalPrice = total;
     });
   }
 
@@ -126,19 +142,6 @@ class PreTestSQLite extends State<MyApp> {
     );
   }
 
-  grandTotal() {
-    int total;
-    List<Grocery> listGroceries;
-    if (listGroceries.length > 0) {
-      for (int i = 0; i < listGroceries.length; i++) {
-        total = total + (listGroceries[i].price * listGroceries[i].quantity);
-      }
-    } else {
-      total = 0;
-    }
-    return Text("GRAND TOTAL : $total");
-  }
-
   SingleChildScrollView dataTable(List<Grocery> groceries) {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
@@ -225,7 +228,7 @@ class PreTestSQLite extends State<MyApp> {
           children: <Widget>[
             form(),
             list(),
-            grandTotal(),
+            Text("GRAND TOTAL : $grandTotalPrice"),
           ],
         ),
       ),

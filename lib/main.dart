@@ -17,7 +17,9 @@ class MyApp extends StatefulWidget {
 
 class PreTestSQLite extends State<MyApp> {
   Future<List<Grocery>> groceries;
-  TextEditingController controllerName, controllerPrice, controllerQuantity = TextEditingController();
+  TextEditingController controllerName,
+      controllerPrice,
+      controllerQuantity = TextEditingController();
   int id, price, quantity;
   String name;
 
@@ -124,6 +126,19 @@ class PreTestSQLite extends State<MyApp> {
     );
   }
 
+  grandTotal() {
+    int total;
+    List<Grocery> listGroceries;
+    if (listGroceries.length > 0) {
+      for (int i = 0; i < listGroceries.length; i++) {
+        total = total + (listGroceries[i].price * listGroceries[i].quantity);
+      }
+    } else {
+      total = 0;
+    }
+    return Text("GRAND TOTAL : $total");
+  }
+
   SingleChildScrollView dataTable(List<Grocery> groceries) {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
@@ -210,6 +225,7 @@ class PreTestSQLite extends State<MyApp> {
           children: <Widget>[
             form(),
             list(),
+            grandTotal(),
           ],
         ),
       ),

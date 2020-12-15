@@ -4,18 +4,42 @@ import './model/Grocery.dart';
 import 'dart:async';
 import './database/DBHelper.dart';
 
-class MyApp extends StatefulWidget {
-  final String title;
+void main() => runApp(new MyApp());
 
-  MyApp({Key key, this.title}) : super(key: key);
-
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
   @override
-  State<StatefulWidget> createState() {
-    return PreTestSQLite();
+  Widget build(BuildContext context) {
+    return new MaterialApp(
+      // title: 'Flutter Demo',
+      theme: new ThemeData(
+        // This is the theme of your application.
+        //
+        // Try running your application with "flutter run". You'll see the
+        // application has a blue toolbar. Then, without quitting the app, try
+        // changing the primarySwatch below to Colors.green and then invoke
+        // "hot reload" (press "r" in the console where you ran "flutter run",
+        // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
+        // counter didn't reset back to zero; the application is not restarted.
+        primarySwatch: Colors.blue,
+      ),
+      home: new PreTest(),
+    );
   }
 }
 
-class PreTestSQLite extends State<MyApp> {
+class PreTest extends StatefulWidget {
+  final String title;
+
+  PreTest({Key key, this.title}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() {
+    return _PreTestSQLite();
+  }
+}
+
+class _PreTestSQLite extends State<PreTest> {
   Future<List<Grocery>> groceries;
   TextEditingController controllerName,
       controllerPrice,
@@ -32,6 +56,9 @@ class PreTestSQLite extends State<MyApp> {
     super.initState();
     dbHelper = DBHelper();
     isUpdating = false;
+    controllerName = TextEditingController(text: ' ');
+    controllerPrice = TextEditingController(text: ' ');
+    controllerQuantity = TextEditingController(text: ' ');
     refreshList();
   }
 
@@ -45,7 +72,8 @@ class PreTestSQLite extends State<MyApp> {
   regenerateTotal() {
     int total;
     List<Grocery> listGroceries;
-    if (listGroceries.length > 0) {
+    int listLength = listGroceries == null ? 0 : listGroceries.length;
+    if (listLength > 0) {
       for (int i = 0; i < listGroceries.length; i++) {
         total = total + (listGroceries[i].price * listGroceries[i].quantity);
       }
@@ -94,6 +122,7 @@ class PreTestSQLite extends State<MyApp> {
             TextFormField(
               controller: controllerName,
               keyboardType: TextInputType.text,
+              maxLength: 3,
               decoration: InputDecoration(labelText: 'Name'),
               validator: (val) => val.length == 0 ? 'Enter Name' : null,
               onSaved: (val) => name = val,
@@ -106,7 +135,7 @@ class PreTestSQLite extends State<MyApp> {
               ],
               decoration: InputDecoration(labelText: 'Price'),
               validator: (val) => val.length == 0 ? 'Enter Price' : null,
-              onSaved: (val) => price = val as int,
+              onSaved: (val) => price = int.parse(val),
             ),
             TextFormField(
               controller: controllerQuantity,
@@ -116,7 +145,7 @@ class PreTestSQLite extends State<MyApp> {
               ],
               decoration: InputDecoration(labelText: 'Quantity'),
               validator: (val) => val.length == 0 ? 'Enter Quantity' : null,
-              onSaved: (val) => quantity = val as int,
+              onSaved: (val) => quantity = int.parse(val),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -145,7 +174,8 @@ class PreTestSQLite extends State<MyApp> {
   SingleChildScrollView dataTable(List<Grocery> groceries) {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
-      child: DataTable(
+      child: FittedBox(
+          child: DataTable(
         columns: [
           DataColumn(
             label: Text('NAME'),
@@ -191,7 +221,7 @@ class PreTestSQLite extends State<MyApp> {
               ]),
             )
             .toList(),
-      ),
+      )),
     );
   }
 

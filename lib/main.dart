@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_app/model/Contact.dart';
+import 'package:flutter_app/screen/GroceryDetail.dart';
 import './model/Grocery.dart';
 import 'dart:async';
 import './database/DBHelper.dart';
+import './screen/ContactEditor.dart';
 
 void main() => runApp(new MyApp());
 
@@ -35,7 +38,8 @@ class PreTest extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _PreTestSQLite();
+    // return _PreTestSQLite();
+    return _PreTestContact();
   }
 }
 
@@ -162,6 +166,14 @@ class _PreTestSQLite extends State<PreTest> {
                     clearName();
                   },
                   child: Text('CANCEL'),
+                ),
+                FlatButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SecondRoute()));
+                  },
+                  child: Text('DETAIL'),
                 )
               ],
             ),
@@ -176,52 +188,53 @@ class _PreTestSQLite extends State<PreTest> {
       scrollDirection: Axis.vertical,
       child: FittedBox(
           child: DataTable(
-        columns: [
-          DataColumn(
-            label: Text('NAME'),
-          ),
-          DataColumn(
-            label: Text('PRICE'),
-          ),
-          DataColumn(
-            label: Text('QUANTITY'),
-          ),
-          DataColumn(
-            label: Text('EDIT'),
-          ),
-          DataColumn(
-            label: Text('DELETE'),
-          )
-        ],
-        rows: groceries
-            .map(
-              (groceries) => DataRow(cells: [
-                DataCell(Text(groceries.name)),
-                DataCell(Text(groceries.price.toString())),
-                DataCell(Text(groceries.quantity.toString())),
-                DataCell(IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () {
-                    setState(() {
-                      isUpdating = true;
-                      id = groceries.id;
-                    });
-                    controllerName.text = groceries.name;
-                    controllerPrice.text = groceries.price.toString();
-                    controllerQuantity.text = groceries.quantity.toString();
-                  },
-                )),
-                DataCell(IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () {
-                    dbHelper.delete(groceries.id);
-                    refreshList();
-                  },
-                )),
-              ]),
+            columns: [
+              DataColumn(
+                label: Text('NAME'),
+              ),
+              DataColumn(
+                label: Text('PRICE'),
+              ),
+              DataColumn(
+                label: Text('QUANTITY'),
+              ),
+              DataColumn(
+                label: Text('EDIT'),
+              ),
+              DataColumn(
+                label: Text('DELETE'),
+              )
+            ],
+            rows: groceries
+                .map(
+                  (groceries) =>
+                  DataRow(cells: [
+                    DataCell(Text(groceries.name)),
+                    DataCell(Text(groceries.price.toString())),
+                    DataCell(Text(groceries.quantity.toString())),
+                    DataCell(IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed: () {
+                        setState(() {
+                          isUpdating = true;
+                          id = groceries.id;
+                        });
+                        controllerName.text = groceries.name;
+                        controllerPrice.text = groceries.price.toString();
+                        controllerQuantity.text = groceries.quantity.toString();
+                      },
+                    )),
+                    DataCell(IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        dbHelper.delete(groceries.id);
+                        refreshList();
+                      },
+                    )),
+                  ]),
             )
-            .toList(),
-      )),
+                .toList(),
+          )),
     );
   }
 
@@ -264,4 +277,124 @@ class _PreTestSQLite extends State<PreTest> {
       ),
     );
   }
+}
+
+
+class _PreTestContact extends State<PreTest> {
+  Future<List<Contact>> contact;
+  int id;
+  String name, phone, email;
+
+  final formKey = new GlobalKey<FormState>();
+  var dbHelper;
+  bool isUpdating;
+
+  @override
+  void initState() {
+    super.initState();
+    dbHelper = DBHelper();
+    isUpdating = false;
+    _getContact();
+  }
+
+  _getContact(){
+    setState(() {
+      contact = dbHelper.getContact();
+    });
+  }
+
+  _contactList(List<Contact> contactList) {
+    return new InkWell(
+      child: Card(
+        child: Column(
+          children: <Widget>[
+            Text(contactList[0].name),
+            Text(contactList[0].phone),
+            Text(contactList[0].email),
+          ],
+        )
+      ),
+    );
+  }
+
+  _contactList2(List<Contact> contactList, int index) {
+    final contact = contactList[index];
+    return new Container(
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
+                child: Row(children: <Widget>[
+                  Text(contact.name, style: new TextStyle(fontSize: 30.0),),
+                  Spacer(),
+                ]),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 4.0, bottom: 80.0),
+                child: Row(children: <Widget>[
+                  Text(contact.phone, style: new TextStyle(fontSize: 30.0),),
+                  Spacer(),
+                ]),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                child: Row(
+                  children: <Widget>[
+                    Text(contact.email, style: new TextStyle(fontSize: 30.0),),
+                    Spacer(),
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  }
+
+  list() {
+    return Expanded(
+      child: FutureBuilder(
+        future: contact,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return _contactList(snapshot.data);
+          }
+
+          if (null == snapshot.data || snapshot.data.length == 0) {
+            return Text("No groceries were found");
+          }
+
+          return CircularProgressIndicator();
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text('CONTACT LIST'),
+      ),
+      body: new Container(
+        child: new Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          verticalDirection: VerticalDirection.down,
+          children: <Widget>[
+            list(),
+          ],
+        ),
+      ),
+    );
+  }
+
+}
+
+class _data {
 }

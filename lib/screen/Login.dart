@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-
 class Login extends StatefulWidget {
-
   @override
   State<StatefulWidget> createState() => new _State();
 }
@@ -11,14 +9,12 @@ class _State extends State<Login> {
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  _login(){
-    if(nameController.text == 'admin' && passwordController == 'admin'){
+  _login() {
+    if (nameController.text == 'admin' && passwordController == 'admin') {
       // Navigator.push(context, route)
-    }else{
-      
-    }
+    } else {}
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,23 +70,6 @@ class _State extends State<Login> {
                         print(passwordController.text);
                       },
                     )),
-                // Container(
-                //     child: Row(
-                //       children: <Widget>[
-                //         Text('Does not have account?'),
-                //         FlatButton(
-                //           textColor: Colors.blue,
-                //           child: Text(
-                //             'LOGIN',
-                //             style: TextStyle(fontSize: 20),
-                //           ),
-                //           onPressed: () {
-                //             //signup screen
-                //           },
-                //         )
-                //       ],
-                //       mainAxisAlignment: MainAxisAlignment.center,
-                //     ))
               ],
             )));
   }

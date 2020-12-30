@@ -31,6 +31,10 @@ dependencies:
   sqflite: ^1.3.0
   path_provider: ^1.6.24
   http: ^0.12.2
+  scoped_model:
+  flutter_rating: ^0.0.2
+  localstorage:
+
 
 dev_dependencies:
   flutter_test:
